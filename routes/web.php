@@ -15,6 +15,11 @@ use App\Http\Controllers\UserController;
 |
 */
 
+// Admin Protected Pages Example
+Route::get('/admins-only', function() {
+    return 'Hewmo from admin page';
+})->middleware('can:visitAdminPages');
+
 // User Related Routes
 Route::get('/', [UserController::class, 'showCorrectHomepage'])->name('login');
 Route::post('/register', [UserController::class, 'register'])->middleware('guest');
