@@ -5,11 +5,43 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Intervention\Image\ImageManager;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class UserController extends Controller
 {
+    public function uploadAvatar(Request $request) {
+        $request->validate([
+            'avatar' => 'required|image|max:2000'
+        ]);
+        // get the current user
+        $user = auth()->user();
+        // userid-uniqueId.jpg
+        $filename = $user->id . "-" . uniqid() . ".jpg";
+        // import Image Manager with GD Driver
+        $manager = new ImageManager(new Driver());
+        // Let the manager read the image
+        $image = $manager->read($request->file('avatar'));
+        // object-cover the image and convert to jpeg
+        $imgData = $image->cover(120,120)->toJpeg();
+        // Store in public/avatars
+        Storage::put('public/avatars/'. $filename, $imgData);
+        $oldAvatar = $user->avatar;
+        $user->avatar = $filename;
+        $user->save();
+        // if the old avatar is not the fallback image
+        if($oldAvatar != '/fallback-avatar.jpg') {
+            // delete the old image
+            Storage::delete(str_replace('/storage/', 'public/', $oldAvatar));
+        }
+        return redirect('/profile/'. $user->username)->with('success', 'Congrats on the New Avatar');
+    }
+    public function showAvatarForm() {
+        return view('avatar-form');
+    }
     public function profile(User $user) {
-        return view('profile-posts', ['username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postCount' => $user->posts()->count()]);
+        return view('profile-posts', ['username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postCount' => $user->posts()->count(), 'avatar' => $user->avatar]);
     }
     public function showCorrectHomepage() {
         if (auth()->check()) {
