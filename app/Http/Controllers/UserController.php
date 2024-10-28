@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Follow;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\View;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -41,13 +42,24 @@ class UserController extends Controller
     public function showAvatarForm() {
         return view('avatar-form');
     }
-    public function profile(User $user) {
+    private function getSharedData($user) {
         $currentlyFollowing = 0;
         if(auth()->check()) {
             $currentlyFollowing = Follow::where([['user_id', '=', auth()->user()->id], ['followeduser', '=', $user->id]])->count();
         }
-        
-        return view('profile-posts', ['currentlyFollowing' => $currentlyFollowing ,'username' => $user->username, 'posts' => $user->posts()->latest()->get(), 'postCount' => $user->posts()->count(), 'avatar' => $user->avatar]);
+        View::share('sharedData', ['currentlyFollowing' => $currentlyFollowing ,'username' => $user->username, 'postCount' => $user->posts()->count(), 'avatar' => $user->avatar]);
+    }
+    public function profile(User $user) {
+        $this->getSharedData($user);
+        return view('profile-posts', ['posts' => $user->posts()->latest()->get()]);
+    }
+    public function profileFollowers(User $user) {
+        $this->getSharedData($user);
+        return view('profile-followers', ['posts' => $user->posts()->latest()->get()]);
+    }
+    public function profileFollowing(User $user) {
+        $this->getSharedData($user);
+        return view('profile-following', ['posts' => $user->posts()->latest()->get()]);
     }
     public function showCorrectHomepage() {
         if (auth()->check()) {

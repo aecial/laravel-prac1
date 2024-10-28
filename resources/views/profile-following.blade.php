@@ -8,5 +8,5 @@
     @endforeach
  
  
-  </div>
+</div>
 </x-profile>
