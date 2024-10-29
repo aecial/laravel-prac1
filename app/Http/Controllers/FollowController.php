@@ -24,9 +24,10 @@ class FollowController extends Controller
         $newFollow->user_id = auth()->user()->id;
         $newFollow->followeduser = $user->id;
         $newFollow->save();
-        return 'Omkei!';
+        return back()->with('success', 'You followed this user!');
     }
     public function removeFollow(User $user) {
         Follow::where([['user_id', '=', auth()->user()->id], ['followeduser', '=', $user->id]])->delete();
+        return back()->with('failure', 'Unfollowed this user!');
     }
 }
