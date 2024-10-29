@@ -49,6 +49,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    
+    public function feedPosts() {
+        // Model you want to end up with
+        // Intermediate Table = you want to lookup with
+        // Foreign key on the Intermediate Table
+        // foreign key on the model you want to end up with
+        // local Key in this Model
+        // local key in the intermediate table but the one being followed
+        return $this->hasManyThrough(Post::class, Follow::class, 'user_id','user_id', 'id', 'followeduser');
+    }
+
     public function followers() {
         return $this->hasMany(Follow::class, 'followeduser');
     }
