@@ -1,4 +1,4 @@
-<x-layout>
+<x-layout doctTitle="Manage Your Avatar">
     <div class="container container--narrow p-4">
         <h2>Upload a New Avatar</h2>
         <form action="/upload-avatar" method="POST" enctype="multipart/form-data">

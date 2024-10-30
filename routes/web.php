@@ -40,7 +40,7 @@ Route::get('/post/{post}', [PostController::class, 'viewSinglePost']);
 Route::delete('/post/{post}',[PostController::class, 'delete'])->middleware('can:delete,post'); // using middleware for the post policy ("can:delete, {route in question}")
 Route::get('/post/{post}/edit', [PostController::class, 'showEditForm'])->middleware('can:update,post');
 Route::put('post/{post}', [PostController::class, 'editPost'])->middleware('can:update,post');
-
+Route::get('/search/{term}', [PostController::class, 'search']);
 // Profile Related Routes
 Route::get('/profile/{user:username}', [UserController::class, 'profile']);
 Route::get('/profile/{user:username}/followers', [UserController::class, 'profileFollowers']);
